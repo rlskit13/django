@@ -17,11 +17,17 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.urls import path, include
 from django.contrib import admin
+from main import views
 
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     path('', include('main.urls')),
     path('tinymce/', include('tinymce.urls')),
+    path("", views.homepage, name="homepage"),
+    path("pollhome/", views.pollhome, name="pollhome"),
+    path("create/", views.create, name="create"),
+    path("vote/<poll_id>", views.vote, name="vote"),
+    path("result/<poll_id>", views.result, name="result"),
 
 ]

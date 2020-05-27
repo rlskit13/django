@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Tutorial, TutorialCategory, TutorialSeries
+from .models import Tutorial, TutorialCategory, TutorialSeries, Poll
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from .forms import NewUserForm
+from .forms import NewUserForm, CreatePollForm
+
 # Create your views here.
 
 def single_slug(request, single_slug):
@@ -30,6 +31,63 @@ def single_slug(request, single_slug):
 		return HttpResponse(f"{single_slug} is a tutorial")
 	
 	return HttpResponse(f"{single_slug} does not correspond to anything")
+
+
+def pollhome(request):
+	if request.user.is_authenticated:
+		polls = Poll.objects.all()
+		context = {
+	        'polls' : polls
+	    }
+		return render(request, 'poll/home.html', context)
+	else:
+		messages.info(request, f"Please login or register new account.")
+		return redirect("main:login_request")
+
+def create(request):
+	if request.user.is_authenticated:
+		form = CreatePollForm()
+		context = {'form' : form}
+		#context = {}
+		if request.method == 'POST':
+			form = CreatePollForm(request.POST)
+			if form.is_valid():
+				form.save()
+				return redirect('pollhome')
+			else:
+				form = CreatePollForm()
+			context = {'form' : form}
+		return render(request, 'poll/create.html', context)
+	else:
+		messages.info(request, f"Please login or register new account.")
+		return redirect("main:login_request")
+
+def vote(request, poll_id):
+	poll = Poll.objects.get(pk=poll_id)
+	if request.method == 'POST':
+		selected_option = request.POST['poll']
+		if selected_option == 'option1':
+			poll.option_one_count += 1
+		elif selected_option == 'option2':
+			poll.option_two_count += 1
+		elif selected_option == 'option3':
+			poll.option_three_count += 1
+		else:
+			return HttpResponse(400, 'Invalid form')
+		poll.save()
+
+		return redirect('result', poll.id)
+
+	context = {
+        'poll' : poll
+    }
+	return render(request, 'poll/vote.html', context)
+
+def result(request, poll_id):
+	poll = Poll.objects.get(pk=poll_id)
+	context = {'poll':poll}
+	return render(request, 'poll/results.html', context)
+
 
 def homepage(request):
 	if request.user.is_authenticated:
@@ -86,3 +144,4 @@ def login_request(request):
 
 	form = AuthenticationForm()
 	return render(request, "main/login.html", {"form":form})
+

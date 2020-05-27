@@ -11,4 +11,7 @@ urlpatterns = [
 	path("logout/", views.logout_request, name="logout_request"),
 	path("login/", views.login_request, name="login_request"),
 	path("<single_slug>", views.single_slug, name="single_slug"),
+
+
+
 ]

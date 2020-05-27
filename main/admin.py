@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tutorial, TutorialSeries, TutorialCategory
+from .models import Tutorial, TutorialSeries, TutorialCategory, Poll
 from tinymce.widgets import TinyMCE
 from django.db import models
 
@@ -17,6 +17,18 @@ class TutorialAdmin(admin.ModelAdmin):
 
     }
 
+
+class PollAdmin(admin.ModelAdmin):
+    fieldsets = [
+    ("Poll question", {"fields": ["question"]}),
+    ("Option 1", {"fields": ["option_one"]}),
+    ("Option 2", {"fields": ["option_two"]}),
+    ("Option 3", {"fields": ["option_three"]})
+    ]
+
+
 admin.site.register(TutorialCategory)
 admin.site.register(TutorialSeries)
 admin.site.register(Tutorial, TutorialAdmin)
+admin.site.register(Poll, PollAdmin)
+
